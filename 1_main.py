@@ -15,15 +15,12 @@ from eval import eval_net  # 调用测试网络，计算准确率
 from utils import anal_net, load_net, change_classifier, FocalLoss, interp_net
 from train import *
 from dataset import PlainDataset
-
-
-
-
 from train import *
+
+os.environ['TORCH_HOME']=r'D:\anaconda\models'
 
 if __name__ == '__main__':
 
-    device = tc.device('cuda')
     n_classes = 3
     class_name=['Normal', 'Atrophy', 'Edema']
     model_name = 'vgg16'
@@ -43,12 +40,12 @@ if __name__ == '__main__':
     '''[1e-3,1e-4,1e-5]'''
     opt = 'Adam'
     '''Adam | SGD, Default is Adam'''
-    epoch = 1
+    epoch = 100
     batch_size = 4
     sch_mode = False
 
 
-    data_dir = f'./data'
+    data_dir = f'./data/data1012'
     save_dir = f'./saved_models/{model_name}_{loss_mode}_aug{aug}_{opt}'
 
 
@@ -56,6 +53,25 @@ if __name__ == '__main__':
         size = 299
     else:
         size = 224
+
+    print("Loading the pretrained model")
+    net = load_net(model_name, pretrain=True)
+    net = change_classifier(net, model_name, n_classes=n_classes)
+    device = tc.device('cuda')
+    net.to(device)
+
+    train_net(net=net,
+              device=device,
+              data_dir=data_dir,
+              save_dir=save_dir,
+              epochs=epoch,
+              batch_size=batch_size,
+              size=size,
+              aug=aug,
+              loss_mode=loss_mode,
+              opt_mode=opt,
+              lr=lr,
+              sch_mode=sch_mode)
 
     print("Loading best model")
     net = load_net(model_name, pretrain=True)
@@ -69,7 +85,7 @@ if __name__ == '__main__':
              plot_dir=save_dir,
              class_names=['Normal', 'Atrophy', 'Edema'])
 
-    print('cams')
+    print('generating cams')
     test_name=[1,2,3]
     for i in test_name:
         data_dir_test = os.path.join(data_dir, f'test/{i}')
