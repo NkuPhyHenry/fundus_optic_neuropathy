@@ -1,5 +1,7 @@
 # fundus_optic_neuropathy
 Research on assistant diagnosis of fundus optic neuropathy based on deep learning 
+DOI:10.1080/02713683.2022.2138917
+
 This project is for sharing the code in the article.
 
 First, use 0_file_separation.py to separate the files to train and test.
